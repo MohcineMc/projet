@@ -47,15 +47,15 @@ pipeline {
                 script {
                     echo 'Installing Netlify CLI...'
                     
-                    // Installer Netlify CLI dans un répertoire local
-                    sh 'npm install --prefix $HOME netlify-cli'
+                    // Installer Netlify CLI globalement dans le conteneur Docker
+                    sh 'npm install -g netlify-cli'
 
                     echo 'Netlify CLI version:'
-                    sh '/home/node/netlify --version'
+                    sh 'netlify --version'
 
                     echo 'Deploying to Netlify...'
                     sh '''
-                        /home/nodenetlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
+                        netlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
                     '''
                 }
             }
