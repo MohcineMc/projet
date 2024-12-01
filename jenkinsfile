@@ -31,16 +31,16 @@ pipeline {
                 sh '''
                 apt-get update
                 apt-get install -y nginx
-                # Créer un dossier build et y copier les fichiers statiques
+               
                 mkdir -p dist
                 cp -r src/* build/
                 ls -la
                 echo "Static site built successfully."
 
-                # Copier les fichiers statiques dans le répertoire Nginx
+                
                 cp -r build/* /usr/share/nginx/html/
 
-                # Vérifier que Nginx fonctionne en lançant le service
+            
                 nginx -g 'daemon off;' &
                 ls -la
                 '''
