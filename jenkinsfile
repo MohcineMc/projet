@@ -35,7 +35,25 @@ pipeline {
                 '''
             }
         }
+         
+         stage('Test') {
+            steps {
+                echo 'Running tests...'
 
+                // Si vous avez des tests à exécuter, vous pouvez les ajouter ici
+                // Exemple : Utilisation de npm pour exécuter des tests unitaires
+                sh '''
+                    # Si vous utilisez Jest ou un autre framework de test JS
+                    # Assurez-vous que les dépendances sont installées avant de lancer les tests
+                    npm install
+
+                    # Exécution des tests (ajustez selon votre framework de test)
+                    npm test
+
+                    echo "Tests completed."
+                '''
+            }
+        }
         stage('Deploy to Netlify') {
             agent {
                 docker {
