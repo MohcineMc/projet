@@ -6,7 +6,7 @@ pipeline {
     NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
 }
     stages {
-        stages {
+    
         stage('Checkout') {
             steps {
                 sh'''
@@ -88,4 +88,4 @@ pipeline {
 
        }
    
-}}
+}
