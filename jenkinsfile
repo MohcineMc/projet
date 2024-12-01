@@ -39,7 +39,7 @@ pipeline {
         stage('Deploy to Netlify') {
             agent {
                 docker {
-                    image 'node:16'  # Utilise une image Docker avec Node.js et npm préinstallés
+                    image 'node:16' 
                     reuseNode true
                 }
             }
