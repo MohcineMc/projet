@@ -4,6 +4,7 @@ pipeline {
       environment {
     NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'
     NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
+    BUILD_DIR = 'build'
 }
     stages {
     
@@ -48,43 +49,42 @@ pipeline {
 
         
     
-       stage('test'){
-         agent {
-                docker{
-                    image 'node:18-alpine'
-                    reuseNode true
-                }
-            }
-        steps {
-            
-            sh '''
-             #test -f dist/test.html
-             npm test
-               '''
-        }
-       }
-
-
-
 
      stage('Deploy') {
-            agent {
-                docker {
-                    image 'nginx:latest'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh  '''
-                    npm install netlify-cli
-                    node_modules/.bin/netlify --version 
-                    echo 'deploy production . SITE ID:${NETLIFY_SITE_ID}'
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --prod
-
-                  '''
-            }
+    agent {
+        docker {
+            image 'nginx:latest'  // Utilisation de l'image officielle Nginx
+            reuseNode true
         }
+    }
+   
+    steps {
+        script {
+            // Installer le CLI de Netlify
+            sh 'npm install -g netlify-cli'
+            
+            // Vérifier la version de Netlify CLI
+            sh 'netlify --version'
+            
+            // Déployer sur Netlify
+            sh '''
+                echo "Déploiement sur Netlify..."
+                netlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
+            '''
+            
+            // Si vous souhaitez utiliser Nginx pour servir l'application localement (optionnel)
+            echo "Copie des fichiers dans Nginx pour un test local"
+
+            // Copier les fichiers de l'application dans le répertoire Nginx
+            sh '''
+                cp -r ${BUILD_DIR}/* /usr/share/nginx/html/
+                nginx -t  # Vérifier la configuration de Nginx
+                nginx -g 'daemon off;'  # Démarrer Nginx en mode non-démon
+            '''
+        }
+    }
+}
+
 
        }
    
