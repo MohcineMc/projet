@@ -1,0 +1,92 @@
+pipeline {
+    agent any
+
+      environment {
+    NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'
+    NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
+}
+    stages {
+        
+        stage('build') {
+            agent {
+                docker{
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh  '''
+                  ls -la
+                 node --version
+                 npm --version 
+                 npm ci
+                 npm run build 
+                  ls -la 
+                  '''
+            }
+        }
+    
+       stage('test'){
+         agent {
+                docker{
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+        steps {
+            
+            sh '''
+             #test -f dist/test.html
+             npm test
+               '''
+        }
+       }
+
+
+    //stage('E2E') {
+    //agent {
+      //  docker {
+      //      image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+      //      reuseNode true
+     //  }
+   // }
+   // steps {
+      //  sh ''' 
+   //     npm install serve 
+    //    node_modules/.bin/serve -s dist &
+    //    sleep 10
+    //    npm install playwright
+    //    npm list playwright
+    //    npx playwright test
+    //    npx playwright test node_modules/test-result/spec.js --reporter=html
+
+      //  '''
+    //}
+   
+  //}
+
+
+
+
+     stage('Deploy') {
+            agent {
+                docker{
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh  '''
+                    npm install netlify-cli
+                    node_modules/.bin/netlify --version 
+                    echo 'deploy production . SITE ID:${NETLIFY_SITE_ID}'
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy --dir=dist --prod
+
+                  '''
+            }
+        }
+
+       }
+   
+}
