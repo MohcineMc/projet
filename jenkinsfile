@@ -1,21 +1,21 @@
 pipeline {
     agent any
 
-      environment {
-    NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'
-    NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
-    BUILD_DIR = 'build'
-}
+    environment {
+        NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'
+        NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
+        BUILD_DIR = 'build'
+    }
+
     stages {
-    
+
         stage('Checkout') {
             steps {
-                
                 echo 'Checking out code from repository...'
                 checkout scm
-                
             }
         }
+
         stage('Build') {
             agent {
                 docker {
@@ -23,69 +23,57 @@ pipeline {
                     reuseNode true
                 }
             }
-        
             steps {
                 echo 'Building static site...'
 
-                // Installer Nginx
+                // Passer à root pour exécuter les commandes apt-get
                 sh '''
-                apt-get update
-                apt-get install -y nginx
-               
-                mkdir -p dist
-                cp -r src/* build/
-                ls -la
-                echo "Static site built successfully."
+                    apt-get update && apt-get install -y sudo
+                    sudo apt-get update
+                    sudo apt-get install -y nginx
+                    mkdir -p dist
+                    cp -r src/* build/
+                    ls -la
+                    echo "Static site built successfully."
 
-                
-                cp -r build/* /usr/share/nginx/html/
-
-            
-                nginx -g 'daemon off;' &
-                ls -la
+                    cp -r build/* /usr/share/nginx/html/
+                    nginx -g 'daemon off;' &
+                    ls -la
                 '''
             }
         }
 
-        
-    
+        stage('Deploy') {
+            agent {
+                docker {
+                    image 'nginx:latest'
+                    reuseNode true
+                }
+            }
+            steps {
+                script {
+                    echo 'Installing Netlify CLI...'
+                    sh 'npm install -g netlify-cli'
+                    
+                    echo 'Netlify CLI version:'
+                    sh 'netlify --version'
 
-     stage('Deploy') {
-    agent {
-        docker {
-            image 'nginx:latest'  // Utilisation de l'image officielle Nginx
-            reuseNode true
+                    echo 'Deploying to Netlify...'
+                    sh '''
+                        netlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
+                    '''
+
+                    echo 'Testing Nginx configuration before restart...'
+                    sh 'nginx -t'
+
+                    echo 'Starting Nginx...'
+                    sh '''
+                        cp -r ${BUILD_DIR}/* /usr/share/nginx/html/
+                        nginx -g "daemon off;"
+                    '''
+                }
+            }
         }
+
     }
-   
-    steps {
-        script {
-            // Installer le CLI de Netlify
-            sh 'npm install -g netlify-cli'
-            
-            // Vérifier la version de Netlify CLI
-            sh 'netlify --version'
-            
-            // Déployer sur Netlify
-            sh '''
-                echo "Déploiement sur Netlify..."
-                netlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
-            '''
-            
-            // Si vous souhaitez utiliser Nginx pour servir l'application localement (optionnel)
-            echo "Copie des fichiers dans Nginx pour un test local"
-
-            // Copier les fichiers de l'application dans le répertoire Nginx
-            sh '''
-                cp -r ${BUILD_DIR}/* /usr/share/nginx/html/
-                nginx -t  # Vérifier la configuration de Nginx
-                nginx -g 'daemon off;'  # Démarrer Nginx en mode non-démon
-            '''
-        }
-    }
-}
-
-
-       }
-   
 }
