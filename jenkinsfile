@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'
-        NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
-        BUILD_DIR = 'build'
+        NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'  // ID du site Netlify
+        NETLIFY_AUTH_TOKEN = credentials('netilfy-token')  // Token Netlify (stocké dans Jenkins)
+        BUILD_DIR = 'build'  // Répertoire de build
     }
 
     stages {
@@ -26,16 +26,12 @@ pipeline {
             steps {
                 echo 'Building static site...'
 
-                // Copier directement les fichiers dans le répertoire de travail Nginx
+                // Créer le répertoire de build et copier les fichiers dans ce répertoire
                 sh '''
-                    mkdir -p build
-                    cp -r projet/  build/
-                    ls -la
+                    mkdir -p ${BUILD_DIR}
+                    cp -r projet/* ${BUILD_DIR}/
+                    ls -la ${BUILD_DIR}
                     echo "Static site built successfully."
-
-                    # Copier les fichiers dans le répertoire Nginx
-                    cp -r build/* /usr/share/nginx/html/
-                    ls -la
                 '''
             }
         }
@@ -43,25 +39,25 @@ pipeline {
         stage('Deploy') {
             agent {
                 docker {
-                    image 'nginx:latest'
+                    image 'node:18'  // Utilisation d'une image Node.js pour l'installation de Netlify CLI
                     reuseNode true
                 }
             }
             steps {
                 script {
                     echo 'Installing Netlify CLI...'
+                    // Installation de Netlify CLI
                     sh 'npm install -g netlify-cli'
                     
                     echo 'Netlify CLI version:'
+                    // Vérification de l'installation
                     sh 'netlify --version'
 
                     echo 'Deploying to Netlify...'
+                    // Déploiement du site vers Netlify
                     sh '''
                         netlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
                     '''
-
-                    
-                    
                 }
             }
         }
