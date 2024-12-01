@@ -39,14 +39,16 @@ pipeline {
         stage('Deploy to Netlify') {
             agent {
                 docker {
-                    image 'node:16' 
+                    image 'node:18'  // Utiliser une version plus récente de Node.js
                     reuseNode true
                 }
             }
             steps {
                 script {
                     echo 'Installing Netlify CLI...'
-                    sh 'npm install -g netlify-cli'
+                    
+                    // Installer Netlify CLI dans un répertoire local
+                    sh 'npm install --prefix $HOME netlify-cli'
 
                     echo 'Netlify CLI version:'
                     sh 'netlify --version'
