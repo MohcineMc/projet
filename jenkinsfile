@@ -35,7 +35,16 @@ pipeline {
                 '''
             }
         }
-
+        stage('test du projet') {
+            steps {
+                sh ''' 
+                echo "start the test"
+                ls -la
+                echo "Tests completed."
+                 
+                 '''
+            }
+        }
         stage('Deploy to Netlify') {
             agent {
                 docker {
