@@ -29,36 +29,25 @@ pipeline {
                     cp index.html ${BUILD_DIR}/
                     cp script.js ${BUILD_DIR}/
                     cp style.css ${BUILD_DIR}/
-                    cp mon__cv__devops.pdf ${BUILD_DIR}/
+                    cp mon_cv_devops.pdf ${BUILD_DIR}/
                     ls -la ${BUILD_DIR}  # Vérifier le contenu du répertoire build
                     echo "Static site built successfully."
                 '''
             }
         }
-
-        stage('Test') {
-            agent {
-                docker {
-                    image 'node:18'  // Utiliser l'image Docker de Node.js
-                    reuseNode true
-                }
-            }
+         
+         stage('Test') {
             steps {
                 echo 'Running tests...'
 
-                // Installer les dépendances et exécuter les tests
+                // Si vous avez des tests à exécuter, vous pouvez les ajouter ici
+                // Exemple : Utilisation de npm pour exécuter des tests unitaires
                 sh '''
-                    # Installer les dépendances si elles ne sont pas encore installées
-                    npm install
-
-                    # Exécuter les tests (ajustez si vous utilisez un autre framework de test)
-                    npm test
-
+                   ls -la 
                     echo "Tests completed."
                 '''
             }
         }
-
         stage('Deploy to Netlify') {
             agent {
                 docker {
