@@ -26,18 +26,15 @@ pipeline {
             steps {
                 echo 'Building static site...'
 
-                // Passer à root pour exécuter les commandes apt-get
+                // Copier directement les fichiers dans le répertoire de travail Nginx
                 sh '''
-                    apt-get update && apt-get install -y sudo
-                    sudo apt-get update
-                    sudo apt-get install -y nginx
                     mkdir -p dist
                     cp -r src/* build/
                     ls -la
                     echo "Static site built successfully."
 
+                    # Copier les fichiers dans le répertoire Nginx
                     cp -r build/* /usr/share/nginx/html/
-                    nginx -g 'daemon off;' &
                     ls -la
                 '''
             }
