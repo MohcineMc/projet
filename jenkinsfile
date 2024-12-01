@@ -3,12 +3,12 @@ pipeline {
 
     environment {
         NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'
-        NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
+        NETLIFY_AUTH_TOKEN = credentials('netilfy-token') // Assurez-vous que ce secret est bien configuré dans Jenkins
         BUILD_DIR = 'build'
     }
 
     stages {
-        
+
         stage('Checkout') {
             steps {
                 echo 'Checking out code from GitHub repository...'
@@ -45,18 +45,10 @@ pipeline {
             }
             steps {
                 script {
-                    echo 'Installing Netlify CLI...'
+                    echo 'Installing Netlify CLI using npx...'
                     
-                    // Installer Netlify CLI globalement dans le conteneur Docker
-                    sh 'npm install -g netlify-cli'
-
-                    echo 'Netlify CLI version:'
-                    sh 'netlify --version'
-
-                    echo 'Deploying to Netlify...'
-                    sh '''
-                        netlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
-                    '''
+                    // Utiliser npx pour éviter l'installation globale de la CLI Netlify
+                    sh 'npx netlify-cli deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}'
                 }
             }
         }
