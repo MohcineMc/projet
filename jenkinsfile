@@ -29,8 +29,8 @@ pipeline {
 
                 // Installer Nginx
                 sh '''
-                apk add --no-cache nginx
-
+                apt-get update
+                apt-get install -y nginx
                 # Créer un dossier build et y copier les fichiers statiques
                 mkdir -p dist
                 cp -r src/* build/
