@@ -29,7 +29,7 @@ pipeline {
                 // Copier directement les fichiers dans le répertoire de travail Nginx
                 sh '''
                     mkdir -p dist
-                    cp -r projet/* build/
+                    cp -r projet/  build/
                     ls -la
                     echo "Static site built successfully."
 
