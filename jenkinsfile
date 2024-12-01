@@ -37,6 +37,12 @@ pipeline {
         }
 
         stage('Deploy to Netlify') {
+            agent {
+                docker {
+                    image 'node:16'  # Utilise une image Docker avec Node.js et npm préinstallés
+                    reuseNode true
+                }
+            }
             steps {
                 script {
                     echo 'Installing Netlify CLI...'
