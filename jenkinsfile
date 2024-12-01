@@ -2,54 +2,50 @@ pipeline {
     agent any
 
     environment {
-        // Identifiants de Netlify
-        NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'  // ID de votre site sur Netlify
-        NETLIFY_AUTH_TOKEN = credentials('netilfy-token')  // Token Netlify stocké dans Jenkins (assurez-vous d'avoir configuré ce secret dans Jenkins)
-        
-        // Répertoire de build (où se trouvent vos fichiers statiques)
-        BUILD_DIR = 'build'  // Définir votre répertoire de build
+        NETLIFY_SITE_ID = 'df7bc3b7-664f-4ac6-8028-252e6bb64850'
+        NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
+        BUILD_DIR = 'build'
     }
 
     stages {
         
-        // Étape 1: Checkout du code depuis GitHub
         stage('Checkout') {
             steps {
                 echo 'Checking out code from GitHub repository...'
-                checkout scm  // Cela va automatiquement cloner votre dépôt GitHub
+                checkout scm
             }
         }
 
-        // Étape 2: Construction du site statique
         stage('Build') {
             steps {
                 echo 'Building static site...'
                 
-                // Si vous avez besoin de copier des fichiers spécifiques ou de faire une construction
-                // ici, vous pouvez ajouter des étapes comme la compilation ou la copie des fichiers
+                // Créer le répertoire build
                 sh '''
                     mkdir -p ${BUILD_DIR}  # Créer le répertoire build si nécessaire
-                    cp -r ./* ${BUILD_DIR}/  # Copier les fichiers du projet vers le répertoire build
-                    ls -la ${BUILD_DIR}  # Vérification du contenu du répertoire build
+
+                    # Copier les fichiers nécessaires dans le répertoire build
+                    cp README.md ${BUILD_DIR}/
+                    cp index.html ${BUILD_DIR}/
+                    cp script.js ${BUILD_DIR}/
+                    cp style.css ${BUILD_DIR}/
+                    cp mon__cv__devops.pdf ${BUILD_DIR}/
+                    ls -la ${BUILD_DIR}  # Vérifier le contenu du répertoire build
                     echo "Static site built successfully."
                 '''
             }
         }
 
-        // Étape 3: Déploiement sur Netlify
         stage('Deploy to Netlify') {
             steps {
                 script {
                     echo 'Installing Netlify CLI...'
-                    // Installer le Netlify CLI via npm (nécessite Node.js)
                     sh 'npm install -g netlify-cli'
 
                     echo 'Netlify CLI version:'
-                    // Vérification de la version du Netlify CLI
                     sh 'netlify --version'
 
                     echo 'Deploying to Netlify...'
-                    // Déployer le site sur Netlify
                     sh '''
                         netlify deploy --dir=${BUILD_DIR} --prod --site=${NETLIFY_SITE_ID} --auth ${NETLIFY_AUTH_TOKEN}
                     '''
