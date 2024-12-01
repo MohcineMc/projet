@@ -29,6 +29,7 @@ pipeline {
                     cp index.html ${BUILD_DIR}/
                     cp script.js ${BUILD_DIR}/
                     cp style.css ${BUILD_DIR}/
+                    cp IMAGE-INSTA ${BUILD_DIR}/
                     cp mon__cv__devops.pdf ${BUILD_DIR}/
                     ls -la ${BUILD_DIR}  # Vérifier le contenu du répertoire build
                     echo "Static site built successfully."
@@ -45,7 +46,7 @@ pipeline {
                  '''
             }
         }
-        stage('Deploy to Netlify') {
+        stage('Deploy ') {
             agent {
                 docker {
                     image 'node:18'  // Utiliser une version plus récente de Node.js

@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: #1896df;
     color: #333;
     display: flex;
     justify-content: center;
@@ -13,7 +13,7 @@ body {
   .container {
     text-align: center;
     padding: 20px;
-    background: white;
+    background: hwb(177 71% 8%);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 80%;
@@ -44,7 +44,7 @@ body {
   }
   
   .download-btn {
-    background-color: #3498db;
+    background-color: rgb(14, 48, 241);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -57,4 +57,18 @@ body {
   .download-btn:hover {
     background-color: #2980b9;
   }
-  
+  .profile-image {
+    width: 250px;          /* Largeur de l'image */
+    height: 250px;         /* Hauteur de l'image */
+    border-radius: 50%;   /* Forme ronde */
+    object-fit: cover;    /* Assure que l'image garde son rapport d'aspect sans être déformée */
+    border: 4px solid #180b0b; /* Bordure verte autour de l'image */
+  }
+  .p{
+    background-color: aliceblue;
+    color: black;
+    font-size:xx-large;
+    border: black;
+    margin: 12px;
+     
+  }
