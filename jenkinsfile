@@ -6,25 +6,47 @@ pipeline {
     NETLIFY_AUTH_TOKEN = credentials('netilfy-token')
 }
     stages {
-        
-        stage('build') {
+        stages {
+        stage('Checkout') {
+            steps {
+                sh'''
+                echo 'Checking out code from repository...'
+                checkout scm
+                '''
+            }
+        }
+        stage('Build') {
             agent {
-                docker{
-                    image 'node:18-alpine'
+                docker {
+                    image 'nginx:latest'
                     reuseNode true
                 }
             }
+        
             steps {
-                sh  '''
-                  ls -la
-                 node --version
-                 npm --version 
-                 npm ci
-                 npm run build 
-                  ls -la 
-                  '''
+                echo 'Building static site...'
+
+                // Installer Nginx
+                sh '''
+                apk add --no-cache nginx
+
+                # Créer un dossier build et y copier les fichiers statiques
+                mkdir -p dist
+                cp -r src/* build/
+                ls -la
+                echo "Static site built successfully."
+
+                # Copier les fichiers statiques dans le répertoire Nginx
+                cp -r build/* /usr/share/nginx/html/
+
+                # Vérifier que Nginx fonctionne en lançant le service
+                nginx -g 'daemon off;' &
+                ls -la
+                '''
             }
         }
+
+        
     
        stage('test'){
          agent {
@@ -43,35 +65,12 @@ pipeline {
        }
 
 
-    //stage('E2E') {
-    //agent {
-      //  docker {
-      //      image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-      //      reuseNode true
-     //  }
-   // }
-   // steps {
-      //  sh ''' 
-   //     npm install serve 
-    //    node_modules/.bin/serve -s dist &
-    //    sleep 10
-    //    npm install playwright
-    //    npm list playwright
-    //    npx playwright test
-    //    npx playwright test node_modules/test-result/spec.js --reporter=html
-
-      //  '''
-    //}
-   
-  //}
-
-
 
 
      stage('Deploy') {
             agent {
-                docker{
-                    image 'node:18-alpine'
+                docker {
+                    image 'nginx:latest'
                     reuseNode true
                 }
             }
@@ -81,7 +80,7 @@ pipeline {
                     node_modules/.bin/netlify --version 
                     echo 'deploy production . SITE ID:${NETLIFY_SITE_ID}'
                     node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=dist --prod
+                    node_modules/.bin/netlify deploy --dir=build --prod
 
                   '''
             }
