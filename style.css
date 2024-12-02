@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #48e618;
+    background-color: #055ee4;
     color: #333;
     display: flex;
     justify-content: center;
@@ -73,6 +73,7 @@ body {
      
   }
   .divv{
+    width: auto;
  border-radius: 20px;
  font-size: larger;
  font-weight: 300;
