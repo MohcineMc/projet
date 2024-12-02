@@ -72,3 +72,11 @@ body {
     margin: 12px;
      
   }
+  .divv{
+ border-radius: 20px;
+ font-size: larger;
+ font-weight: 300;
+ background-color: chartreuse;
+box-sizing: border-box;
+ margin: 23px;
+  }
